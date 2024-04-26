@@ -4,9 +4,9 @@ import numpy as np
 class Tensor():
     def __init__(
             self, 
-            shape: Shape,
+            # shape: Shape,
             elements: np.array,
             deltas: np.array) -> None:
-        self.shape = shape
+        # self.shape = shape
         self.elements = elements
         self.deltas = deltas

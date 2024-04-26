@@ -7,17 +7,19 @@ class FullyConnected(Layer):
     def __init__(
             self, 
             weightmatrix: Tensor,
-            bias: Tensor,
-            in_shape: Shape,
-            out_shape:Shape) -> None:
+            bias: Tensor
+            # in_shape: Shape,
+            # out_shape:Shape
+            ) -> None:
         self.weightmatrix = weightmatrix
         self.bias = bias
-        self.in_shape = in_shape
-        self.out_shape = out_shape
+        # self.in_shape = in_shape
+        # self.out_shape = out_shape
         
     # overwrite 
     def forward(self, in_tensors: list[Tensor], out_tensors: list[Tensor]):
-        pass
+        for i in range(0, len(in_tensors)):
+            out_tensors[i] = in_tensors[i].elements * self.weightmatrix.elements + self.bias
     
     # overwrite
     def backward(self, out_tensors: list[Tensor], in_tensors: list[Tensor]):
