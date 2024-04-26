@@ -1,2 +1,8 @@
+from dataclasses import dataclass
+import numpy as np
+
+@dataclass
 class Shape():
-    pass
+    def __init__(self, int_array: np.ndarray):
+        self.int_array = int_array
+        self.volume = int_array[0]
