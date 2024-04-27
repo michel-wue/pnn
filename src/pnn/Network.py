@@ -1,7 +1,6 @@
-from .layer.activation import ActivationLayer
+from .layer.activation import activation
 from .layer.fully_connected import FullyConnected
 from .layer.input_layer import InputLayer
-from .layer.softmax import SoftmaxLayer
 from .layer.layer import Layer
 
 class Network():
