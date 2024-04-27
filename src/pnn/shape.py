@@ -3,6 +3,6 @@ import numpy as np
 
 @dataclass
 class Shape():
-    def __init__(self, int_array: np.ndarray):
-        self.int_array = int_array
-        self.volume = int_array[0]
+    def __init__(self, shape: tuple):
+        self.shape = tuple
+        #self.volume = tuple[0]

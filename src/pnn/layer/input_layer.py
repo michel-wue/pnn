@@ -7,7 +7,7 @@ class InputLayer:
         tensorlist = []
         for datapoint in rawData:
             flattened_input = np.ndarray.flatten(datapoint, order='C')
-            flattened_input = flattened_input.reshape(-1, 1)
+            # flattened_input = flattened_input.reshape(-1, 1)
             tensorlist.append(Tensor(elements=flattened_input, deltas=None))
             # tensorlist.append(Tensor(shape=flattened_input, elements=flattened_input, deltas=None))
         return tensorlist
