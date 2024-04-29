@@ -1,7 +1,7 @@
 import numpy as np
 
 from .tensor import Tensor
-from .layer.activation import ActivationLayer
+from .layerivationLayer
 from .layer.fully_connected import FullyConnected
 from .layer.input_layer import InputLayer
 from .layer.layer import Layer
