@@ -30,7 +30,7 @@ def tanh(in_tensor: Tensor, out_tensor: Tensor):
 def soft_max(in_tensor: Tensor, out_tensor: Tensor):
     summe = np.sum(np.exp(in_tensor.elements))
     #summe = np.sum(summe)
-    softmax_lambda = lambda x_i: np.exp(x_i)
+    softmax_lambda = lambda x_i: np.exp(x_i)/summe
     softmax_func = np.vectorize(softmax_lambda)
-    softmax_func /= summe
+    # softmax_func /= summe
     out_tensor.elements = softmax_func(in_tensor.elements)

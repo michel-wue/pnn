@@ -6,20 +6,19 @@ import numpy as np
 class FullyConnected(Layer):
     def __init__(
             self, 
-            # weightmatrix: Tensor,
-            # bias: Tensor
-            in_shape: tuple,
-            out_shape: tuple
+            out_shape: tuple,
             ) -> None:
-        self.in_shape = in_shape
         self.out_shape = out_shape
-        self.bias = Tensor(np.random.rand(out_shape[0]), None)
-        self.weightmatrix = Tensor(np.random.rand(out_shape[0], in_shape[0]), None)
-        # self.in_shape = in_shape
-        # self.out_shape = out_shape
+        # set input shape in Network
+        self.in_shape = None
+        self.bias = None
+        self.weightmatrix = None
         
     # overwrite 
     def forward(self, in_tensors: list[Tensor], out_tensors: list[Tensor]):
+        self.in_shape = (len(in_tensors[0].elements),)
+        self.bias = Tensor(np.random.rand(self.out_shape[0]), None)
+        self.weightmatrix = Tensor(np.random.rand(self.out_shape[0], self.in_shape[0]), None)
         for i in range(0, len(in_tensors)):
             out_matrix = np.dot(self.weightmatrix.elements, 
                                 in_tensors[i].elements) + self.bias.elements
