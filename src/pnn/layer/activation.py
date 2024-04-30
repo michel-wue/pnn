@@ -4,7 +4,7 @@ from typing import Callable
 from pnn.tensor import Tensor
 from .layer import Layer
 
-#t
+
 class ActivationLayer(Layer):
     def __init__(self, activation: Callable) -> None:
         self.activation = activation
@@ -29,7 +29,6 @@ def tanh(in_tensor: Tensor, out_tensor: Tensor):
 
 def soft_max(in_tensor: Tensor, out_tensor: Tensor):
     summe = np.sum(np.exp(in_tensor.elements))
-    #summe = np.sum(summe)
     softmax_lambda = lambda x_i: np.exp(x_i)/summe
     softmax_func = np.vectorize(softmax_lambda)
     # softmax_func /= summe

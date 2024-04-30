@@ -1,15 +1,14 @@
 import numpy as np
 import unittest
 
-from layer import CrossEntropyLossLayer, MSELossLayer
-from tensor import Tensor
-
+from pnn.layer.loss import LossLayer, mean_squared_error, cross_entropy
+from pnn.tensor import Tensor
 
 # Import CrossEntropy and Tensor from your own module
 
 class TestCrossEntropy(unittest.TestCase):
     def setUp(self) -> None:
-        self.cross_entropy = CrossEntropyLossLayer()
+        self.cross_entropy = LossLayer(cross_entropy)
 
     def test_forward(self) -> None:
         test_cases = [
@@ -92,7 +91,7 @@ class TestCrossEntropy(unittest.TestCase):
 
 class TestMeanSquaredError(unittest.TestCase):
     def setUp(self) -> None:
-        self.mean_squared_error = MSELossLayer()
+        self.mean_squared_error = LossLayer(mean_squared_error)
 
     def test_forward(self) -> None:
         test_cases = [

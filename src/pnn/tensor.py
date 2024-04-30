@@ -6,7 +6,7 @@ class Tensor():
             self, 
             # shape: Shape,
             elements: np.array,
-            deltas: np.array) -> None:
+            deltas: np.array = None) -> None:
         self.elements = elements
         self.deltas = deltas
         self.shape = elements.shape
