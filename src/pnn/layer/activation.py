@@ -14,22 +14,42 @@ class ActivationLayer(Layer):
             self.activation(in_tensor=in_tensors[i], out_tensor=out_tensors[i])
 
     def backward(self, out_tensors: list[Tensor], in_tensors: list[Tensor]):
-        pass
+        for i in range(0, len(in_tensors)):
+            self.activation(in_tensor=in_tensors[i], out_tensor=out_tensors[i], forward = False)
 
-def sigmoid(in_tensor: Tensor, out_tensor: Tensor):
-    sigmoid_lambda = lambda x: 1/(1 + np.exp(-x))
-    sigmoid_func = np.vectorize(sigmoid_lambda)
-    out_tensor = Tensor(sigmoid_func(in_tensor.elements), None)
+def _raw_sigmoid(in_tensor: Tensor):
+    return 1/(1 + np.exp(-in_tensor.elements))
+
+def sigmoid(in_tensor: Tensor, out_tensor: Tensor, forward: bool = True):
+    if forward:
+        out_tensor.elements = _raw_sigmoid(in_tensor)
+    else:
+        in_tensor.deltas = np.multiply(np.multiply(_raw_sigmoid(in_tensor), (1 - _raw_sigmoid(in_tensor))), out_tensor.deltas)
+
+def _raw_soft_max(in_tensor: Tensor):
+    summe = np.sum(np.exp(in_tensor.elements))
+    return np.divide(np.exp(in_tensor.elements), summe)
+
+def soft_max(in_tensor: Tensor, out_tensor: Tensor, forward: bool = True):
+    if forward:
+        out_tensor.elements = _raw_soft_max(in_tensor)
+    else: 
+        length = len(in_tensor.elements)
+        matrix1 = np.zeros(shape=(length,length))
+        matrix2 = np.zeros(shape=(length,length))
+        for i in range(length):
+            for j in range(length):
+                if i == j:
+                    matrix1[i][j] = out_tensor.elements[i]
+                
+                matrix2[i][j] = out_tensor.elements[i] * out_tensor.elements[j]
+
+        in_tensor.deltas = np.dot(out_tensor.deltas, matrix1 - matrix2) 
+            
+        # in_tensor.deltas = np.multiply(_raw_soft_max(in_tensor), out_tensor.deltas)
 
 def relu(in_tensor: Tensor, out_tensor: Tensor):
     pass
 
 def tanh(in_tensor: Tensor, out_tensor: Tensor):
     pass
-
-def soft_max(in_tensor: Tensor, out_tensor: Tensor):
-    summe = np.sum(np.exp(in_tensor.elements))
-    softmax_lambda = lambda x_i: np.exp(x_i)/summe
-    softmax_func = np.vectorize(softmax_lambda)
-    # softmax_func /= summe
-    out_tensor.elements = softmax_func(in_tensor.elements)

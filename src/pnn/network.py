@@ -3,7 +3,7 @@ import numpy as np
 from .tensor import Tensor
 from .layer.activation import ActivationLayer
 from .layer.fully_connected import FullyConnected
-from .layer.input_layer import InputLayer
+from .layer.input import InputLayer
 from .layer.layer import Layer
 
 class Network():
@@ -21,8 +21,10 @@ class Network():
         self.tensorlist.append(input_tensor)
         out_shape = None
         for layer in self.layers:
-            if isinstance(layer, FullyConnected):
+            if isinstance(layer, FullyConnected):    
                 out_shape = layer.out_shape
+                layer.bias = Tensor(np.random.rand(out_shape[0]), None)
+                layer.weightmatrix = Tensor(np.random.rand(out_shape[0], layer.in_shape[0]), None)   
             self.tensorlist.append(np.array([Tensor(np.random.rand(out_shape[0]), None)
                                                 for j in range(0, length_input)]))
             layer.forward(self.tensorlist[-2], self.tensorlist[-1])
