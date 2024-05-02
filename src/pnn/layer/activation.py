@@ -34,7 +34,7 @@ def soft_max(in_tensor: Tensor, out_tensor: Tensor, forward: bool = True):
     if forward:
         out_tensor.elements = _raw_soft_max(in_tensor)
     else: 
-        length = len(in_tensor.elements)
+        length = len(out_tensor.elements)
         matrix1 = np.zeros(shape=(length,length))
         matrix2 = np.zeros(shape=(length,length))
         for i in range(length):
