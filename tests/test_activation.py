@@ -1,8 +1,8 @@
 import unittest
-from pnn.layer.activation import ActivationLayer, soft_max, sigmoid, relu 
+from src.pnn.layer.activation import ActivationLayer, soft_max, sigmoid, relu 
 # from pnn.layer import SigmoidLayer as Sigmoid
 # from pnn.layer import ReLULayer as ReLU
-from pnn.tensor import Tensor
+from src.pnn.tensor import Tensor
 import numpy as np
 
 

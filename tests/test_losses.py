@@ -1,8 +1,8 @@
 import numpy as np
 import unittest
 
-from pnn.layer.loss import LossLayer, mean_squared_error, cross_entropy
-from pnn.tensor import Tensor
+from src.pnn.layer.loss import LossLayer, mean_squared_error, cross_entropy
+from src.pnn.tensor import Tensor
 
 # Import CrossEntropy and Tensor from your own module
 
