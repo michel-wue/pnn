@@ -1,14 +1,14 @@
 import unittest
-from layer import SoftmaxLayer as Softmax
-from layer import SigmoidLayer as Sigmoid
-from layer import ReLULayer as ReLU
-from tensor import Tensor
+from pnn.layer.activation import ActivationLayer, soft_max, sigmoid, relu 
+# from pnn.layer import SigmoidLayer as Sigmoid
+# from pnn.layer import ReLULayer as ReLU
+from pnn.tensor import Tensor
 import numpy as np
 
 
 class TestSoftmax(unittest.TestCase):
     def setUp(self) -> None:
-        self.softmax = Softmax()
+        self.softmax = ActivationLayer(soft_max)
 
     def test_forward(self) -> None:
         in_tensors = [Tensor(elements=np.array([1, 2, 3, 4], dtype=np.float64))]
@@ -54,7 +54,7 @@ class TestSoftmax(unittest.TestCase):
 
 class TestSigmoid(unittest.TestCase):
     def setUp(self) -> None:
-        self.sigmoid = Sigmoid()
+        self.sigmoid = ActivationLayer(sigmoid)
 
     def test_forward(self) -> None:
         in_tensors = [Tensor(elements=np.array([-2, 2, 0, 4, 5], dtype=np.float64))]
@@ -93,7 +93,7 @@ class TestSigmoid(unittest.TestCase):
 
 class TestReLU(unittest.TestCase):
     def setUp(self) -> None:
-        self.relu = ReLU()
+        self.relu = ActivationLayer(relu)
 
     def test_forward(self) -> None:
         in_tensors = [Tensor(elements=np.array([-2, 2, 0, 4, 5], dtype=np.float64))]

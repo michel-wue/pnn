@@ -1,10 +1,13 @@
 import unittest
-from layer import FullyConnectedLayer, Pooling2DLayer, Conv2DLayer, PoolingType
+from pnn.layer.fully_connected import FullyConnectedLayer
+from pnn.layer.fully_connected import Pooling2DLayer
+from pnn.layer.fully_connected import Conv2DLayer
+from pnn.layer.fully_connected import PoolingType
 
 import unittest
 import numpy as np
-from shape import Shape
-from tensor import Tensor
+from pnn.shape import Shape
+from pnn.tensor import Tensor
 
 
 class TestPooling2D(unittest.TestCase):
