@@ -38,7 +38,8 @@ class Network():
                     out_shape = layer.out_shape.shape
                     layer.in_shape = Shape((len(self.tensorlist[-1][0].elements), 1))
                     layer.bias = Tensor(np.random.rand(out_shape[0]), None)
-                    layer.weights = Tensor(np.random.rand(layer.in_shape.shape[0], out_shape[0]), None)
+                    layer.weights = Tensor(_init_weightmatrix((layer.in_shape.shape[0], out_shape[0]), layer.initialization_technique), None)
+                    # layer.weights = Tensor(np.random.rand(layer.in_shape.shape[0], out_shape[0]), None)
                 if not isinstance(layer, LossLayer):
                     self.tensorlist.append(np.array([Tensor(np.random.rand(out_shape[0]), None) for j in range(0, length_input)]))
                     layer.forward(self.tensorlist[-2], self.tensorlist[-1])    
@@ -54,13 +55,26 @@ class Network():
             if isinstance(layer, LossLayer):
                 layer.backward(predictions=self.tensorlist[i], targets=self.labels)
             else:
+            # backward weglassen bei i = 0? deltas werden glaube nicht mehr benötigt
                 layer.backward(out_tensors=self.tensorlist[i+1], in_tensors=self.tensorlist[i])
                 if isinstance(layer, FullyConnected):
-                    print(1)
-                    layer.calculate_delta_weights(out_tensors=self.tensorlist[i], in_tensors=self.tensorlist[i-1])
+                    # print(1)
+                    layer.calculate_delta_weights(out_tensors=self.tensorlist[i+1], in_tensors=self.tensorlist[i])
 
     def save_params():
         pass
 
     def load_params():
         pass
+
+def _init_weightmatrix(shape: tuple, initialization: str) -> np.ndarray:
+    # He initialization 
+    if initialization == 'relu':
+        limit = np.sqrt(2 / shape[0])
+        return np.random.uniform(-limit, limit, size=shape)
+    # Xavier initilization
+    elif initialization == 'tanh' or initialization == 'sigmoid' or initialization == 'softmax':
+        limit = np.sqrt(6 / np.sum(shape))
+        return np.random.uniform(-limit, limit, size=shape)
+    else:
+        raise ValueError('{initialization} not one of: relu, sigmoid, tanh, softmax'.format(shape=repr(initialization)))

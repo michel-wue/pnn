@@ -7,10 +7,12 @@ class FullyConnected(Layer):
     def __init__(
             self, 
             out_shape: Shape,
+            initialization_technique: str,
             in_shape: Shape = None,
             ) -> None:
         self.out_shape = out_shape
         self.in_shape = in_shape
+        self.initialization_technique = initialization_technique
         # set input shape in Network
         self.bias: Tensor = None
         self.weights: Tensor = None

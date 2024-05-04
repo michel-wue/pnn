@@ -15,12 +15,12 @@ class LossLayer(Layer):
         for i in range(len(targets)):
             predictions[i].deltas = self.loss(target=targets[i], prediction=predictions[i], forward = False) 
                 
-
+# can still optimize by pulling out the len functions and passing the length as arg
 def mean_squared_error(target: Tensor, prediction: Tensor, forward: bool = True) -> float:  
     if forward:
         return np.sum(np.divide(np.power(target.elements - prediction.elements, 2), len(target.elements)))
     else:  
-        return prediction.elements - target.elements
+        return np.multiply(np.divide(2, len(target.elements)), prediction.elements - target.elements)
 
 
 def cross_entropy(target: Tensor, prediction: Tensor, forward: bool = True):

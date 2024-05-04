@@ -1,8 +1,8 @@
 import numpy as np
 import unittest
 
-from src.pnn.layer.loss import LossLayer, mean_squared_error, cross_entropy
-from src.pnn.tensor import Tensor
+from pnn.layer.loss import LossLayer, mean_squared_error, cross_entropy
+from pnn.tensor import Tensor
 
 # Import CrossEntropy and Tensor from your own module
 
@@ -134,22 +134,22 @@ class TestMeanSquaredError(unittest.TestCase):
             {
                 'predictions': [Tensor(elements=np.array([0.1, 0.2, 0.3, 0.4], dtype=np.float64))],
                 'targets': [Tensor(elements=np.array([1, 0, 0, 0], dtype=np.float64))],
-                'expected_output': np.array([-0.9, 0.2, 0.3, 0.4]),
+                'expected_output': np.array([-0.45,  0.1 ,  0.15,  0.2]),
             },
             {
                 'predictions': [Tensor(elements=np.array([0.25, 0.25, 0.25, 0.25], dtype=np.float64))],
                 'targets': [Tensor(elements=np.array([0, 0, 0, 1], dtype=np.float64))],
-                'expected_output': np.array([0.25, 0.25, 0.25, -0.75]),
+                'expected_output': np.array([0.125, 0.125, 0.125, -0.375]),
             },
             {
                 'predictions': [Tensor(elements=np.array([0.01, 0.01, 0.01, 0.97], dtype=np.float64))],
                 'targets': [Tensor(elements=np.array([0, 0, 0, 1], dtype=np.float64))],
-                'expected_output': np.array([0.01, 0.01, 0.01, -0.03]),
+                'expected_output': np.array([0.005, 0.005, 0.005, -0.015]),
             },
             {
                 'predictions': [Tensor(elements=np.array([0.99, 0.01, 0.01, 0.01], dtype=np.float64))],
                 'targets': [Tensor(elements=np.array([0, 0, 0, 1], dtype=np.float64))],
-                'expected_output': np.array([0.99, 0.01, 0.01, -0.99]),
+                'expected_output': np.array([0.495, 0.005, 0.005, -0.495])
             },
         ]
 
