@@ -43,6 +43,7 @@ class TestFullyConnectedLayer(unittest.TestCase):
         out_tensors = [Tensor(elements=np.array([0, 0], dtype=np.float64))]
         out_tensors[0].deltas = np.array([8, 9])
         self.fc_layer.calculate_delta_weights(out_tensors, in_tensors)
+        print(self.bias.deltas)
         self.assertTrue(
             np.array_equal(self.weight_matrix.deltas, np.array([[8, 9], [16, 18]])),
             "FCLayer calculate delta weights function does not calculate the correct deltas for the weight matrix",

@@ -19,16 +19,15 @@ class Network():
         self.initialize: bool = True
         self.labels: list[Tensor]
 
-    def _transform_labels(self, labels: np.ndarray) -> list[Tensor]:
-        unique_length = len(np.unique(labels))
-        tensor_list = [Tensor(np.zeros(shape=(unique_length,))) for i in range(len(labels))]
+    def _transform_labels(self, labels: np.ndarray, unique_length: int) -> list[Tensor]:
+        label_list = [Tensor(np.zeros(shape=(unique_length,))) for i in range(len(labels))]
         for i, label in enumerate(labels):
-            np.put(tensor_list[i].elements, label, 1)
-        return tensor_list
+            np.put(label_list[i].elements, label, 1)
+        return label_list
 
-    def forward(self, data: list[np.ndarray], labels: np.ndarray) -> np.float64:
+    def forward(self, data: list[np.ndarray], labels: np.ndarray, unique_length: int = 0) -> np.float64:
         if self.initialize:
-            self.labels = self._transform_labels(labels)
+            self.labels = self._transform_labels(labels, unique_length=unique_length)
             input_tensor = self.input.forward(data)
             length_input = len(input_tensor)
             self.tensorlist.append(input_tensor)
@@ -46,7 +45,10 @@ class Network():
             self.initialize = False
         else:
             for i in range(len(self.layers)-1):
+                if i == 0:
+                    self.tensorlist[0] = self.input.forward(data)
                 self.layers[i].forward(self.tensorlist[i], self.tensorlist[i+1])
+        # calculate loss with last element from tensorlist + labels
         return self.layers[-1].forward(self.tensorlist[-1], self.labels)
             
     

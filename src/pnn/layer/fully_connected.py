@@ -7,7 +7,7 @@ class FullyConnected(Layer):
     def __init__(
             self, 
             out_shape: Shape,
-            initialization_technique: str,
+            initialization_technique: str = None, 
             in_shape: Shape = None,
             ) -> None:
         self.out_shape = out_shape
@@ -35,6 +35,7 @@ class FullyConnected(Layer):
         x_matrix = np.array([in_tensor.elements for in_tensor in in_tensors])
         dY_matrix = np.array([out_tensor.deltas for out_tensor in out_tensors])
         self.weights.deltas = np.dot(x_matrix.T, dY_matrix)
+        # self.bias.deltas = dY_matrix
         self.bias.deltas = np.sum(dY_matrix, axis=0)
 
     def save_params():
