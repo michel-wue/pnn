@@ -40,6 +40,7 @@ class Network():
                     layer.weights = Tensor(_init_weightmatrix((layer.in_shape.shape[0], out_shape[0]), layer.initialization_technique), None)
                     # layer.weights = Tensor(np.random.rand(layer.in_shape.shape[0], out_shape[0]), None)
                 if not isinstance(layer, LossLayer):
+                    # self.tensorlist.append(np.array([Tensor(np.zeros(out_shape[0]), None) for j in range(0, length_input)]))
                     self.tensorlist.append(np.array([Tensor(np.random.rand(out_shape[0]), None) for j in range(0, length_input)]))
                     layer.forward(self.tensorlist[-2], self.tensorlist[-1])    
             self.initialize = False
@@ -60,8 +61,32 @@ class Network():
             # backward weglassen bei i = 0? deltas werden glaube nicht mehr benötigt
                 layer.backward(out_tensors=self.tensorlist[i+1], in_tensors=self.tensorlist[i])
                 if isinstance(layer, FullyConnected):
-                    # print(1)
                     layer.calculate_delta_weights(out_tensors=self.tensorlist[i+1], in_tensors=self.tensorlist[i])
+
+    # Shapes will likely be problematic when saving the network
+
+    def predict(self, data: list[np.ndarray]) -> list[int]:
+        # last layer is loss layer so it gets cut out in predict
+        #length_input = len(data)
+        prediction = []
+        for input in data:
+            for i in range(len(self.layers)-1):
+                if i == 0:
+                    self.tensorlist[0] = self.input.forward([input])
+                self.layers[i].forward(self.tensorlist[i], self.tensorlist[i+1])
+
+                single_prediciton = np.argmax(self.tensorlist[-1][0].elements)
+                prediction.append(single_prediciton)
+                print(single_prediciton)
+                #out_shape = self.tensorlist[i+1][0].shape
+                # change size of output tensor to match required size ()
+                #self.tensorlist[i+1] = np.array([Tensor(np.zeros(out_shape), None) for j in range(length_input)])
+                # if i == 0:
+                #     self.tensorlist[0] = self.input.forward(data)
+                # self.layers[i].forward(self.tensorlist[i], self.tensorlist[i+1])
+
+        return np.array(prediction)
+        # return np.array([np.argmax(tensor.elements) for tensor in self.tensorlist[-1]])
 
     def save_params():
         pass

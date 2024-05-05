@@ -1,7 +1,7 @@
 import numpy as np
-from .layer.fully_connected import FullyConnected
+# from .layer.fully_connected import FullyConnected
 from typing import Callable
-from .network import Network
+from .network import Network, FullyConnected
 
 class Trainer:
     def __init__(
@@ -18,7 +18,8 @@ class Trainer:
         self.shuffle = shuffle
 
     def optimize(self, network: Network, data: list[np.ndarray], labels: np.ndarray):
-        unique_length = len(np.unique(labels)) # required for label init
+        # unique_length = len(np.unique(labels)) # required for label init
+        unique_length = 10 # required for label init
         loss = 0
         for i in range(self.amount_epochs):
             number_of_batches = int(np.ceil(len(data)/self.batch_size))
@@ -42,6 +43,5 @@ class Trainer:
 def sgd(network: Network, learning_rate: float):
     for layer in network.layers:
         if isinstance(layer, FullyConnected):
-            print(layer.weights.deltas[0])
-            layer.weights = layer.weights - np.multiply(learning_rate, layer.weights.deltas)
-            layer.bias = layer.bias - np.multiply(learning_rate, layer.bias.deltas)
+            layer.weights.elements = layer.weights.elements - np.multiply(learning_rate, layer.weights.deltas)
+            layer.bias.elements = layer.bias.elements - np.multiply(learning_rate, layer.bias.deltas)

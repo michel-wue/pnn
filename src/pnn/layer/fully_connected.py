@@ -21,8 +21,8 @@ class FullyConnected(Layer):
     def forward(self, in_tensors: list[Tensor], out_tensors: list[Tensor]):
         for i in range(0, len(in_tensors)):
             out_matrix = np.dot(in_tensors[i].elements, self.weights.elements) + self.bias.elements
-            # out_matrix = np.dot(self.weights.elements, in_tensors[i].elements) + self.bias.elements
-            out_tensors[i] = Tensor(elements=out_matrix, deltas=None)
+            out_tensors[i].elements = out_matrix
+            #out_tensors[i] = Tensor(elements=out_matrix, deltas=None)
     
     # overwrite
     def backward(self, out_tensors: list[Tensor], in_tensors: list[Tensor]):
