@@ -2,6 +2,7 @@ import numpy as np
 # from .layer.fully_connected import FullyConnected
 from typing import Callable
 from .network import Network, FullyConnected
+import random
 
 class Trainer:
     def __init__(
@@ -16,12 +17,15 @@ class Trainer:
         self.update_mechanism = update_mechanism
         self.batch_size = batch_size
         self.shuffle = shuffle
+        self.loss = []
 
-    def optimize(self, network: Network, data: list[np.ndarray], labels: np.ndarray):
+    def optimize(self, network: Network, data: list[np.ndarray], labels: np.ndarray) -> None:
         # unique_length = len(np.unique(labels)) # required for label init
         unique_length = 10 # required for label init
-        loss = 0
         for i in range(self.amount_epochs):
+            epoch_loss = []
+            if self.shuffle:
+                data, labels = _shuffle(data=data, labels=labels)
             number_of_batches = int(np.ceil(len(data)/self.batch_size))
             unequal_size = len(data)%self.batch_size
             unequal_size_bool: bool = unequal_size == 0
@@ -36,13 +40,20 @@ class Trainer:
                     batch = data[j*self.batch_size:(j+1)*self.batch_size]
                     batch_labels = labels[j*self.batch_size:(j+1)*self.batch_size]
                 batch_labels = np.array(batch_labels)
-                loss = network.forward(data=batch, labels=batch_labels, unique_length=unique_length)
+                epoch_loss.append(network.forward(data=batch, labels=batch_labels, unique_length=unique_length))
                 network.backprop()
                 self.update_mechanism(network=network, learning_rate=self.learning_rate)
-            print(f"epoche: {i}, loss: {loss}")
+            self.loss.append(np.average(epoch_loss))
+            print(f"epoche: {i}, loss: {self.loss[i]}")
             
-def sgd(network: Network, learning_rate: float):
+def sgd(network: Network, learning_rate: float) -> None:
     for layer in network.layers:
         if isinstance(layer, FullyConnected):
             layer.weights.elements = layer.weights.elements - np.multiply(learning_rate, layer.weights.deltas)
             layer.bias.elements = layer.bias.elements - np.multiply(learning_rate, layer.bias.deltas)
+
+def _shuffle(data: list[np.ndarray], labels: np.ndarray) -> tuple[list[np.ndarray], np.ndarray]:
+    c = list(zip(data, labels))
+    random.shuffle(c)
+    data, labels = zip(*c)
+    return list(data), np.array(labels)

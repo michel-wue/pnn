@@ -18,7 +18,7 @@ class ActivationLayer(Layer):
             self.activation(in_tensor=in_tensors[i], out_tensor=out_tensors[i], forward = False)
 
 def _raw_sigmoid(in_tensor: Tensor):
-    return 1/(1 + np.exp(-in_tensor.elements))
+    return np.divide(1, (np.add(1, np.exp(-in_tensor.elements))))
 
 def sigmoid(in_tensor: Tensor, out_tensor: Tensor, forward: bool = True):
     if forward:
