@@ -25,6 +25,7 @@ class Trainer:
             number_of_batches = int(np.ceil(len(data)/self.batch_size))
             unequal_size = len(data)%self.batch_size
             unequal_size_bool: bool = unequal_size == 0
+            b = []
             for j in range(number_of_batches):
                 batch = []
                 batch_labels = []

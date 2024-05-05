@@ -48,6 +48,7 @@ class Network():
             for i in range(len(self.layers)-1):
                 if i == 0:
                     self.tensorlist[0] = self.input.forward(data)
+                    self.labels = self._transform_labels(labels, unique_length=unique_length)
                 self.layers[i].forward(self.tensorlist[i], self.tensorlist[i+1])
         # calculate loss with last element from tensorlist + labels
         return self.layers[-1].forward(self.tensorlist[-1], self.labels)
@@ -67,26 +68,28 @@ class Network():
 
     def predict(self, data: list[np.ndarray]) -> list[int]:
         # last layer is loss layer so it gets cut out in predict
-        #length_input = len(data)
-        prediction = []
-        for input in data:
-            for i in range(len(self.layers)-1):
-                if i == 0:
-                    self.tensorlist[0] = self.input.forward([input])
-                self.layers[i].forward(self.tensorlist[i], self.tensorlist[i+1])
+        # prediction = []
+        # for input in data:
+        #     for i in range(len(self.layers)-1):
+        #         if i == 0:
+        #             self.tensorlist[0] = self.input.forward([input])
+        #         self.layers[i].forward(self.tensorlist[i], self.tensorlist[i+1])
 
-                single_prediciton = np.argmax(self.tensorlist[-1][0].elements)
-                prediction.append(single_prediciton)
-                print(single_prediciton)
-                #out_shape = self.tensorlist[i+1][0].shape
-                # change size of output tensor to match required size ()
-                #self.tensorlist[i+1] = np.array([Tensor(np.zeros(out_shape), None) for j in range(length_input)])
-                # if i == 0:
-                #     self.tensorlist[0] = self.input.forward(data)
-                # self.layers[i].forward(self.tensorlist[i], self.tensorlist[i+1])
+        #     single_prediciton = np.argmax(self.tensorlist[-1][0].elements)
+        #     prediction.append(single_prediciton)
+        #     print(single_prediciton)
+        # return np.array(prediction)
 
-        return np.array(prediction)
-        # return np.array([np.argmax(tensor.elements) for tensor in self.tensorlist[-1]])
+        length_input = len(data)
+        for i in range(len(self.layers)-1):
+            out_shape = self.tensorlist[i+1][0].shape
+            # change size of output tensor to match required size ()
+            self.tensorlist[i+1] = np.array([Tensor(np.zeros(out_shape), None) for j in range(length_input)])
+            if i == 0:
+                self.tensorlist[0] = self.input.forward(data)
+            self.layers[i].forward(self.tensorlist[i], self.tensorlist[i+1])
+
+        return np.array([np.argmax(tensor.elements) for tensor in self.tensorlist[-1]])
 
     def save_params():
         pass
