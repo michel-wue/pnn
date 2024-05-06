@@ -3,6 +3,7 @@ import numpy as np
 from typing import Callable
 from .network import Network, FullyConnected
 import random
+import time
 
 class Trainer:
     def __init__(
@@ -17,12 +18,13 @@ class Trainer:
         self.update_mechanism = update_mechanism
         self.batch_size = batch_size
         self.shuffle = shuffle
-        self.loss = []
+        self.parameters = {'epoche': [], 'loss': [], 'time': []}
 
     def optimize(self, network: Network, data: list[np.ndarray], labels: np.ndarray) -> None:
         # unique_length = len(np.unique(labels)) # required for label init
         unique_length = 10 # required for label init
         for i in range(self.amount_epochs):
+            start = time.time()
             epoch_loss = []
             if self.shuffle:
                 data, labels = _shuffle(data=data, labels=labels)
@@ -43,8 +45,12 @@ class Trainer:
                 epoch_loss.append(network.forward(data=batch, labels=batch_labels, unique_length=unique_length))
                 network.backprop()
                 self.update_mechanism(network=network, learning_rate=self.learning_rate)
-            self.loss.append(np.average(epoch_loss))
-            print(f"epoche: {i}, loss: {self.loss[i]}")
+            end = time.time()
+            self.parameters['epoche'].append(i)
+            self.parameters['loss'].append(round(np.average(epoch_loss), 4))
+            self.parameters['time'].append(round(end-start, 4))
+            print(f"epoche: {i}, loss: {self.parameters['loss'][i]}, time: {self.parameters['time'][i]}s")
+
             
 def sgd(network: Network, learning_rate: float) -> None:
     for layer in network.layers:
