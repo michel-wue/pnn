@@ -34,12 +34,10 @@ class FullyConnected(Layer):
     def calculate_delta_weights(self, out_tensors: list[Tensor], in_tensors: list[Tensor]):
         x_matrix = np.array([in_tensor.elements for in_tensor in in_tensors])
         dY_matrix = np.array([out_tensor.deltas for out_tensor in out_tensors])
+        # self.weights.deltas = np.divide(np.dot(x_matrix.T, dY_matrix), len(x_matrix))
+        # self.bias.deltas = np.divide(np.sum(dY_matrix, axis=0), len(dY_matrix))
         self.weights.deltas = np.dot(x_matrix.T, dY_matrix)
-        # self.bias.deltas = dY_matrix
         self.bias.deltas = np.sum(dY_matrix, axis=0)
 
-    def save_params():
-        pass
 
-    def load_params():
-        pass
+        

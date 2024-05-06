@@ -7,6 +7,7 @@ from .layer.loss import LossLayer
 from .layer.input import InputLayer
 from .layer.layer import Layer
 from .shape import Shape
+import pickle
 
 class Network():
     def __init__(
@@ -91,11 +92,12 @@ class Network():
 
         return np.array([np.argmax(tensor.elements) for tensor in self.tensorlist[-1]])
 
-    def save_params():
-        pass
-
-    def load_params():
-        pass
+    def save_network(self, filename):
+        pickle.dump(self, open(filename, 'wb'))
+        
+    @classmethod
+    def load_network(cls, filename):
+        return pickle.load(open(filename, 'rb'))
 
 def _init_weightmatrix(shape: tuple, initialization: str) -> np.ndarray:
     # He initialization 
