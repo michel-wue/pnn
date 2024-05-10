@@ -23,11 +23,16 @@ def _raw_sigmoid(in_tensor: Tensor):
 
 
 def sigmoid(in_tensor: Tensor, out_tensor: Tensor, forward: bool = True):
+    sigmoid = np.divide(1, (np.add(1, np.exp(-in_tensor.elements))))
     if forward:
-        out_tensor.elements = _raw_sigmoid(in_tensor)
+        out_tensor.elements = sigmoid
     else:
-        in_tensor.deltas = np.multiply(np.multiply(_raw_sigmoid(in_tensor), (1 - _raw_sigmoid(in_tensor))),
-                                       out_tensor.deltas)
+        in_tensor.deltas = np.multiply(np.multiply(sigmoid, (1 - sigmoid)), out_tensor.deltas)
+    # if forward:
+    #     out_tensor.elements = _raw_sigmoid(in_tensor)
+    # else:
+    #     in_tensor.deltas = np.multiply(np.multiply(_raw_sigmoid(in_tensor), (1 - _raw_sigmoid(in_tensor))),
+    #                                    out_tensor.deltas)
 
 
 def _raw_soft_max(in_tensor: Tensor):
