@@ -26,17 +26,11 @@ class Conv2DLayer(Layer):
 
     def forward(self, in_tensors: list[Tensor], out_tensors: list[Tensor]):
         for i, tensor in enumerate(in_tensors):
-            output_arr = []
             for y in range(len(tensor.elements) - self.kernel_size.shape[0] + 1):
-                y_arr = []
                 for x in range(len(tensor.elements[0]) - self.kernel_size.shape[1] + 1):
-                    x_arr = []
                     for z in range(self.num_filters):
-                        channel_value = np.sum([np.multiply(tensor.elements[y + i][x + j][a], self.weights.elements[i][j][a][z]) for j in range(self.kernel_size.shape[1]) for i in range(self.kernel_size.shape[0]) for a in range(self.in_shape.shape[2])])
-                        x_arr.append(channel_value)
-                    y_arr.append(x_arr)
-                output_arr.append(y_arr)
-            out_tensors[i].elements = np.array(output_arr)
+                        out_tensors[i].elements[y][x][z] = np.sum([np.multiply(tensor.elements[y + i][x + j][a], self.weights.elements[i][j][a][z]) for j in range(self.kernel_size.shape[1]) for i in range(self.kernel_size.shape[0]) for a in range(self.in_shape.shape[2])])
+
 
     def backward(self, out_tensors: list[Tensor], in_tensors: list[Tensor]):
         pass
