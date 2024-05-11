@@ -304,107 +304,107 @@ class TestConv2DLayer(unittest.TestCase):
             f"Conv2D backward function does not calculate the correct outputs.\nOutputs:\n{in_tensor.deltas}\nbut expected:\n{expected_output.elements}",
         )
 
-#     def test_weight_update(self) -> None:
-#         conv2d = Conv2DLayer(in_shape=Shape((4, 3, 2)), out_shape=Shape((3, 2, 2)), kernel_size=Shape((2, 2)), num_filters=2)
-#         # this filter has the shape (rows, columns, num_channels, num_filters)
-#         conv2d.weights = Tensor(
-#             elements=np.array(
-#                 [[[ [ 0.1, 0.37],
-#                     [ 0.7, 0.9 ]],
+    def test_weight_update(self) -> None:
+        conv2d = Conv2DLayer(in_shape=Shape((4, 3, 2)), out_shape=Shape((3, 2, 2)), kernel_size=Shape((2, 2)), num_filters=2)
+        # this filter has the shape (rows, columns, num_channels, num_filters)
+        conv2d.weights = Tensor(
+            elements=np.array(
+                [[[ [ 0.1, 0.37],
+                    [ 0.7, 0.9 ]],
 
-#                     [[ 0.3, 0.32],
-#                     [ 0.9, 0.2 ]]],
-
-
-#                     [[[-0.2, -0.9 ],
-#                     [ 0.6, 0.3 ]],
-
-#                     [[ 0.4, 0.17],
-#                     [-1.1, -0.7 ]]]]
-#             )
-#         )
-
-#         conv2d.bias = Tensor(elements=np.array([0.0, 0.0]))
-
-#         # this tensor has the following shape (rows, columns, channels)
-#         # init out_tensor (actually values do not matter since they are not needed for the backward pass)
-#         out_tensor = Tensor(
-#             elements=np.array(
-#                 [   [[ 2.,      1.469 ],
-#                     [ 2.123,  -0.1288]],
-
-#                     [[-0.34,   -0.784 ],
-#                     [-3.83,   -3.689 ]],
-
-#                     [[-0.83,   -1.464 ],
-#                     [ 2.06,   -1.984 ]]],
-#                 dtype=np.float64,
-#             )
-#         )
-
-#         # create made up deltas which suit for our test
-#         out_tensor.deltas = np.array(
-#             [[  [ 0.1,  -0.5 ],
-#                 [-0.25, -0.8 ]],
-
-#                 [[ 0.33,  0.2 ],
-#                 [ 1.3,   0.81]],
-
-#                 [[-0.6,   0.1 ],
-#                 [ 0.01,  1.1 ]]],
-#             dtype=np.float64,
-#         )
-
-#         in_tensor = Tensor(
-#             elements=np.array(
-#                 [[  [ 0.1, 0.9 ],
-#                     [ 1.2, 1.1 ],
-#                     [ 0.01, 3.2 ]],
-
-#                     [[-0.2, 0.3 ],
-#                     [ 1.4, 0.7 ],
-#                     [ 0.2, 1.7 ]],
-
-#                     [[ 0.5, 0.5 ],
-#                     [ 1.6, 2.2 ],
-#                     [-0.3, 6.3 ]],
-
-#                     [[ 0.6, 0.65],
-#                     [ 2.2, 4.4 ],
-#                     [ 4., 8.2 ]]]
-#             )
-#         )
-
-#         conv2d.calculate_delta_weights([out_tensor], [in_tensor])
-
-#         expected_output = Tensor(
-#             elements=np.array(
-#                 [   [[[ 1.18,    1.894 ],
-#                     [ 0.546,   1.767 ]],
-
-#                     [[-0.1235, -0.336 ],
-#                     [ 0.494,   5.557 ]]],
+                    [[ 0.3, 0.32],
+                    [ 0.9, 0.2 ]]],
 
 
-#                     [[[ 1.537,   2.856 ],
-#                     [ 2.534,   6.077 ]],
+                    [[[-0.2, -0.9 ],
+                    [ 0.6, 0.3 ]],
 
-#                     [[-1.052,   3.837 ],
-#                     [ 6.003,  13.293 ]]]
-#                 ], dtype=np.float64
-#             )
-#         )
+                    [[ 0.4, 0.17],
+                    [-1.1, -0.7 ]]]]
+            )
+        )
 
-#         self.assertTrue(
-#             np.allclose(
-#                 conv2d.weights.deltas,
-#                 expected_output.elements,
-#                 rtol=1e-05,
-#                 atol=1e-08,
-#             ),
-#             f"Conv2D calculate_weights_deltas function does not calculate the correct outputs."
-#             f"\nOutputs:\n{conv2d.weights.deltas}\nbut expected:\n{expected_output.elements}",
-#         )
+        conv2d.bias = Tensor(elements=np.array([0.0, 0.0]))
+
+        # this tensor has the following shape (rows, columns, channels)
+        # init out_tensor (actually values do not matter since they are not needed for the backward pass)
+        out_tensor = Tensor(
+            elements=np.array(
+                [   [[ 2.,      1.469 ],
+                    [ 2.123,  -0.1288]],
+
+                    [[-0.34,   -0.784 ],
+                    [-3.83,   -3.689 ]],
+
+                    [[-0.83,   -1.464 ],
+                    [ 2.06,   -1.984 ]]],
+                dtype=np.float64,
+            )
+        )
+
+        # create made up deltas which suit for our test
+        out_tensor.deltas = np.array(
+            [[  [ 0.1,  -0.5 ],
+                [-0.25, -0.8 ]],
+
+                [[ 0.33,  0.2 ],
+                [ 1.3,   0.81]],
+
+                [[-0.6,   0.1 ],
+                [ 0.01,  1.1 ]]],
+            dtype=np.float64,
+        )
+
+        in_tensor = Tensor(
+            elements=np.array(
+                [[  [ 0.1, 0.9 ],
+                    [ 1.2, 1.1 ],
+                    [ 0.01, 3.2 ]],
+
+                    [[-0.2, 0.3 ],
+                    [ 1.4, 0.7 ],
+                    [ 0.2, 1.7 ]],
+
+                    [[ 0.5, 0.5 ],
+                    [ 1.6, 2.2 ],
+                    [-0.3, 6.3 ]],
+
+                    [[ 0.6, 0.65],
+                    [ 2.2, 4.4 ],
+                    [ 4., 8.2 ]]]
+            )
+        )
+
+        conv2d.calculate_delta_weights([out_tensor], [in_tensor])
+
+        expected_output = Tensor(
+            elements=np.array(
+                [   [[[ 1.18,    1.894 ],
+                    [ 0.546,   1.767 ]],
+
+                    [[-0.1235, -0.336 ],
+                    [ 0.494,   5.557 ]]],
+
+
+                    [[[ 1.537,   2.856 ],
+                    [ 2.534,   6.077 ]],
+
+                    [[-1.052,   3.837 ],
+                    [ 6.003,  13.293 ]]]
+                ], dtype=np.float64
+            )
+        )
+
+        self.assertTrue(
+            np.allclose(
+                conv2d.weights.deltas,
+                expected_output.elements,
+                rtol=1e-05,
+                atol=1e-08,
+            ),
+            f"Conv2D calculate_weights_deltas function does not calculate the correct outputs."
+            f"\nOutputs:\n{conv2d.weights.deltas}\nbut expected:\n{expected_output.elements}",
+        )
 
     
 
