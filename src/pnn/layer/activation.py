@@ -63,7 +63,7 @@ def relu(in_tensor: Tensor, out_tensor: Tensor, forward: bool = True):
     if forward:
         out_tensor.elements = _raw_relu(in_tensor)
     else:
-        in_tensor.deltas = np.where(out_tensor.deltas > 0, out_tensor.deltas, 0)
+        in_tensor.deltas = np.where(in_tensor.elements >= 0, out_tensor.deltas, 0)
 
 
 def _raw_relu(in_tensor: Tensor):

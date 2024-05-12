@@ -1,8 +1,8 @@
 import unittest
-from src.pnn.layer.activation import ActivationLayer, soft_max, sigmoid, relu 
+from pnn.layer.activation import ActivationLayer, soft_max, sigmoid, relu 
 # from pnn.layer import SigmoidLayer as Sigmoid
 # from pnn.layer import ReLULayer as ReLU
-from src.pnn.tensor import Tensor
+from pnn.tensor import Tensor
 import numpy as np
 
 
@@ -91,43 +91,43 @@ class TestSigmoid(unittest.TestCase):
         )
 
 
-# class TestReLU(unittest.TestCase):
-#     def setUp(self) -> None:
-#         self.relu = ActivationLayer(relu)
+class TestReLU(unittest.TestCase):
+    def setUp(self) -> None:
+        self.relu = ActivationLayer(relu)
 
-#     def test_forward(self) -> None:
-#         in_tensors = [Tensor(elements=np.array([-2, 2, 0, 4, 5], dtype=np.float64))]
-#         out_tensors = [Tensor(elements=np.array([0, 0, 0, 0, 0], dtype=np.float64))]
-#         expected_output = np.array([0, 2, 0, 4, 5])
+    def test_forward(self) -> None:
+        in_tensors = [Tensor(elements=np.array([-2, 2, 0, 4, 5], dtype=np.float64))]
+        out_tensors = [Tensor(elements=np.array([0, 0, 0, 0, 0], dtype=np.float64))]
+        expected_output = np.array([0, 2, 0, 4, 5])
 
-#         self.relu.forward(in_tensors, out_tensors)
-#         self.assertTrue(
-#             np.allclose(
-#                 out_tensors[0].elements,
-#                 expected_output,
-#                 rtol=1e-05,
-#                 atol=1e-08,
-#             ),
-#             "forward function does not calculate the correct outputs",
-#         )
+        self.relu.forward(in_tensors, out_tensors)
+        self.assertTrue(
+            np.allclose(
+                out_tensors[0].elements,
+                expected_output,
+                rtol=1e-05,
+                atol=1e-08,
+            ),
+            "forward function does not calculate the correct outputs",
+        )
 
-#     def test_backward(self) -> None:
-#         in_tensors = [Tensor(elements=np.array([-1, 2, -3, 4], dtype=np.float64))]
-#         out_tensors = [Tensor(elements=np.array([0, 0, 0, 0], dtype=np.float64))]
-#         out_tensors[0].deltas = np.array([-3, -7, 8, 9])
-#         expected_output = np.array([0, -7, 0, 9])
+    def test_backward(self) -> None:
+        in_tensors = [Tensor(elements=np.array([-1, 2, -3, 4], dtype=np.float64))]
+        out_tensors = [Tensor(elements=np.array([0, 0, 0, 0], dtype=np.float64))]
+        out_tensors[0].deltas = np.array([-3, -7, 8, 9])
+        expected_output = np.array([0, -7, 0, 9])
 
-#         self.relu.forward(in_tensors, out_tensors)
-#         self.relu.backward(out_tensors, in_tensors)
-#         self.assertTrue(
-#             np.allclose(
-#                 in_tensors[0].deltas,
-#                 expected_output,
-#                 rtol=1e-05,
-#                 atol=1e-08,
-#             ),
-#             "backward function does not calculate the correct outputs",
-#         )
+        self.relu.forward(in_tensors, out_tensors)
+        self.relu.backward(out_tensors, in_tensors)
+        self.assertTrue(
+            np.allclose(
+                in_tensors[0].deltas,
+                expected_output,
+                rtol=1e-05,
+                atol=1e-08,
+            ),
+            "backward function does not calculate the correct outputs",
+        )
 
 
 if __name__ == "__main__":

@@ -1,4 +1,5 @@
 import numpy as np
+import os
 
 from .tensor import Tensor
 from .layer.activation import ActivationLayer
@@ -93,6 +94,8 @@ class Network():
         return np.array([np.argmax(tensor.elements) for tensor in self.tensorlist[-1]])
 
     def save_network(self, filename):
+        if not os.path.isdir('networks'):
+            os.mkdir('networks')
         pickle.dump(self, open(filename, 'wb'))
         
     @classmethod
