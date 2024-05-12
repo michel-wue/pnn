@@ -12,12 +12,12 @@ Training the models can be done via the run.py and will just rerun and overwrite
 
 ## Benchmarks NN
 
-![[./figures/NN_relu_cross_entropy.png]]
+![plot](./figures/NN_relu_cross_entropy.png)
 
-![[./figures/NN_relu_mse.png]]
+![plot](./figures/NN_relu_mse.png)
 
-![[./figures/NN_sigmoid_cross_entropy.png]]
+![plot](./figures/NN_sigmoid_cross_entropy.png)
 
-![[./figures/NN_sigmoid_mse.png]]
+![plot](./figures/NN_sigmoid_mse.png)
 
 In above figures it can be seen that the sigmoid activation function worked better in conjunction with cross entropy loss and that relu worked better with mse. The Networks might still benefit from further training periods, because the loss was still going down. 
