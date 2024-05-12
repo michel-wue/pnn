@@ -3,9 +3,9 @@
 ## Installation
 
 Install via poetry or use requirements.txt. Additionally use 
-'''
+```
 pip install . 
-'''
+```
 To install the package and make make the src files importable for the tests and run.py (may also be installed in editable mode). 
 
 Training the models can be done via the run.py and will just rerun and overwrite the models and figures shown below.
