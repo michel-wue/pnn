@@ -7,15 +7,19 @@ from .layer.fully_connected import FullyConnected
 from .layer.loss import LossLayer
 from .layer.input import InputLayer
 from .layer.layer import Layer
+from .layer.convolution import Conv2DLayer
+from .layer.pooling import Pooling2DLayer
 from .shape import Shape
 import pickle
+from tqdm import tqdm
 
 class Network():
     def __init__(
             self, 
-            layers: list[Layer]
+            layers: list[Layer],
+            type: str = 'fully_connected'
             ):
-        self.input =  InputLayer()
+        self.input =  InputLayer(type)
         self.layers = layers
         self.tensorlist: list[list[Tensor]] = []
         self.initialize: bool = True
@@ -27,7 +31,7 @@ class Network():
             np.put(label_list[i].elements, label, 1)
         return label_list
 
-    def forward(self, data: list[np.ndarray], labels: np.ndarray, unique_length: int = 0) -> np.float64:
+    def forward(self, data: list[np.ndarray], labels: np.ndarray, unique_length: int = 10) -> np.float64:
         if self.initialize:
             self.labels = self._transform_labels(labels, unique_length=unique_length)
             input_tensor = self.input.forward(data)
@@ -41,9 +45,17 @@ class Network():
                     layer.bias = Tensor(np.random.rand(out_shape[0]), None)
                     layer.weights = Tensor(_init_weightmatrix((layer.in_shape.shape[0], out_shape[0]), layer.initialization_technique), None)
                     # layer.weights = Tensor(np.random.rand(layer.in_shape.shape[0], out_shape[0]), None)
+                if isinstance(layer, Conv2DLayer):
+                    layer.in_shape = Shape((self.tensorlist[-1][0].shape))
+                    layer.out_shape = Shape((layer.in_shape.shape[0] - layer.kernel_size.shape[0] + 1, 
+                                       layer.in_shape.shape[1]  - layer.kernel_size.shape[1] + 1, 
+                                       layer.num_filters))
+                    out_shape = layer.out_shape.shape
+                    layer.bias = Tensor(np.zeros(layer.num_filters), None)
+                    layer.weights = Tensor(_init_weightmatrix((layer.kernel_size.shape[0], layer.kernel_size.shape[1], layer.in_shape.shape[2], layer.num_filters), 'convolution'), None)
                 if not isinstance(layer, LossLayer):
                     # self.tensorlist.append(np.array([Tensor(np.zeros(out_shape[0]), None) for j in range(0, length_input)]))
-                    self.tensorlist.append(np.array([Tensor(np.random.rand(out_shape[0]), None) for j in range(0, length_input)]))
+                    self.tensorlist.append(np.array([Tensor(np.zeros(out_shape), None) for j in range(0, length_input)]))
                     layer.forward(self.tensorlist[-2], self.tensorlist[-1])    
             self.initialize = False
         else:
@@ -104,7 +116,7 @@ class Network():
 
 def _init_weightmatrix(shape: tuple, initialization: str) -> np.ndarray:
     # He initialization 
-    if initialization == 'relu':
+    if initialization == 'relu' or initialization == 'convolution':
         limit = np.sqrt(2 / shape[0])
         return np.random.uniform(-limit, limit, size=shape)
     # Xavier initilization

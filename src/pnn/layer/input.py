@@ -3,13 +3,18 @@ from collections.abc import Sequence
 from ..tensor import Tensor
 
 class InputLayer:
+    def __init__(self, type) -> None:
+        self.type = type
     def forward(self, rawData: list[any]) -> list[Tensor]:
         tensorlist = []
-        for datapoint in rawData:
-            flattened_input = np.ndarray.flatten(datapoint, order='C')
-            # normalize values
-            # flattened_input = np.divide(flattened_input, np.max(flattened_input))
-            # flattened_input = flattened_input.reshape(-1, 1)
-            tensorlist.append(Tensor(elements=flattened_input, deltas=None))
-            # tensorlist.append(Tensor(shape=flattened_input, elements=flattened_input, deltas=None))
-        return tensorlist
+        if self.type == 'fully_connected':
+            for datapoint in rawData:
+                flattened_input = np.ndarray.flatten(datapoint, order='C')
+                tensorlist.append(Tensor(elements=flattened_input, deltas=None))
+            return tensorlist
+        else:
+            for datapoint in rawData:
+                if len(datapoint.shape) < 3:
+                    datapoint = datapoint.reshape(datapoint.shape[0], datapoint.shape[0], 1)
+                tensorlist.append(Tensor(elements=datapoint, deltas=None))
+            return tensorlist
