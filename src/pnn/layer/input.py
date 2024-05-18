@@ -1,5 +1,4 @@
 import numpy as np
-from collections.abc import Sequence
 from ..tensor import Tensor
 
 class InputLayer:

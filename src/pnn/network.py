@@ -9,6 +9,7 @@ from .layer.input import InputLayer
 from .layer.layer import Layer
 from .layer.convolution import Conv2DLayer
 from .layer.pooling import Pooling2DLayer
+from .layer.flatten import FlattenLayer
 from .shape import Shape
 import pickle
 from tqdm import tqdm
@@ -53,6 +54,10 @@ class Network():
                     out_shape = layer.out_shape.shape
                     layer.bias = Tensor(np.zeros(layer.num_filters), None)
                     layer.weights = Tensor(_init_weightmatrix((layer.kernel_size.shape[0], layer.kernel_size.shape[1], layer.in_shape.shape[2], layer.num_filters), 'convolution'), None)
+                if isinstance(layer, FlattenLayer):
+                    out_shape = np.ndarray.flatten(self.tensorlist[-1][0]).shape 
+                    self.tensorlist.append(np.array([Tensor(np.zeros(out_shape), None) for j in range(0, length_input)]))
+                    layer.forward(self.tensorlist[-2], self.tensorlist[-1])
                 if not isinstance(layer, LossLayer):
                     # self.tensorlist.append(np.array([Tensor(np.zeros(out_shape[0]), None) for j in range(0, length_input)]))
                     self.tensorlist.append(np.array([Tensor(np.zeros(out_shape), None) for j in range(0, length_input)]))
@@ -60,8 +65,9 @@ class Network():
             self.initialize = False
         else:
             for i in range(len(self.layers)-1):
-                if i == 0:
-                    self.tensorlist[0] = self.input.forward(data)
+                # if i == 0:
+                if isinstance(self.layers[i], InputLayer):
+                    self.tensorlist[i] = self.input.forward(data)
                     self.labels = self._transform_labels(labels, unique_length=unique_length)
                 self.layers[i].forward(self.tensorlist[i], self.tensorlist[i+1])
         # calculate loss with last element from tensorlist + labels

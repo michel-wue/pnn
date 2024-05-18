@@ -4,6 +4,7 @@ from typing import Callable
 from .network import Network, FullyConnected
 import random
 import time
+from tqdm import tqdm
 
 class Trainer:
     def __init__(
@@ -32,7 +33,7 @@ class Trainer:
             unequal_size = len(data)%self.batch_size
             unequal_size_bool: bool = unequal_size == 0
             b = []
-            for j in range(number_of_batches):
+            for j in tqdm(range(number_of_batches)):
                 batch = []
                 batch_labels = []
                 if j == number_of_batches - 1 and not unequal_size_bool:
