@@ -25,6 +25,7 @@ class Network():
         self.tensorlist: list[list[Tensor]] = []
         self.initialize: bool = True
         self.labels: list[Tensor]
+        self.t = None
 
     def _transform_labels(self, labels: np.ndarray, unique_length: int) -> list[Tensor]:
         label_list = [Tensor(np.zeros(shape=(unique_length,))) for i in range(len(labels))]
@@ -46,31 +47,34 @@ class Network():
                     layer.bias = Tensor(np.random.rand(out_shape[0]), None)
                     layer.weights = Tensor(_init_weightmatrix((layer.in_shape.shape[0], out_shape[0]), layer.initialization_technique), None)
                     # layer.weights = Tensor(np.random.rand(layer.in_shape.shape[0], out_shape[0]), None)
-                if isinstance(layer, Conv2DLayer):
+                elif isinstance(layer, Conv2DLayer):
                     layer.in_shape = Shape((self.tensorlist[-1][0].shape))
+                    # print(layer.in_shape)
                     layer.out_shape = Shape((layer.in_shape.shape[0] - layer.kernel_size.shape[0] + 1, 
                                        layer.in_shape.shape[1]  - layer.kernel_size.shape[1] + 1, 
                                        layer.num_filters))
                     out_shape = layer.out_shape.shape
                     layer.bias = Tensor(np.zeros(layer.num_filters), None)
                     layer.weights = Tensor(_init_weightmatrix((layer.kernel_size.shape[0], layer.kernel_size.shape[1], layer.in_shape.shape[2], layer.num_filters), 'convolution'), None)
-                if isinstance(layer, FlattenLayer):
-                    out_shape = np.ndarray.flatten(self.tensorlist[-1][0]).shape 
-                    self.tensorlist.append(np.array([Tensor(np.zeros(out_shape), None) for j in range(0, length_input)]))
-                    layer.forward(self.tensorlist[-2], self.tensorlist[-1])
+                elif isinstance(layer, FlattenLayer):
+                    out_shape = np.ndarray.flatten(self.tensorlist[-1][0].elements).shape 
+
+                # Append to tensorlist
                 if not isinstance(layer, LossLayer):
-                    # self.tensorlist.append(np.array([Tensor(np.zeros(out_shape[0]), None) for j in range(0, length_input)]))
+                    #print(layer.__class__)
                     self.tensorlist.append(np.array([Tensor(np.zeros(out_shape), None) for j in range(0, length_input)]))
-                    layer.forward(self.tensorlist[-2], self.tensorlist[-1])    
+                    layer.forward(in_tensors=self.tensorlist[-2], out_tensors=self.tensorlist[-1])    
+                    # print(self.tensorlist[-1][0].elements.shape)
             self.initialize = False
         else:
             for i in range(len(self.layers)-1):
-                # if i == 0:
-                if isinstance(self.layers[i], InputLayer):
+                if i == 0:
+                # if isinstance(self.layers[i], InputLayer): # does not work because isinstance does not recognize input layer
                     self.tensorlist[i] = self.input.forward(data)
                     self.labels = self._transform_labels(labels, unique_length=unique_length)
                 self.layers[i].forward(self.tensorlist[i], self.tensorlist[i+1])
         # calculate loss with last element from tensorlist + labels
+        
         return self.layers[-1].forward(self.tensorlist[-1], self.labels)
             
     
