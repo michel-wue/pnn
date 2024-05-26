@@ -66,17 +66,18 @@ class Conv2DLayer(Layer):
         
         for i, in_tensor in enumerate(in_tensors):
             padded_array = np.zeros(self.in_shape.shape)
-            
-            for x in range(self.out_shape.shape[0]):
-                for y in range(self.out_shape.shape[1]):
-                    for z in range(self.num_filters):
-                        padded_array[x + padding_x][y + padding_y][z] = out_tensors[i].deltas[x][y][z]
+            padded_array[padding_x: padding_x + self.out_shape.shape[0], padding_y: padding_y + self.out_shape.shape[1]] = out_tensors[i].deltas
+            # for x in range(self.out_shape.shape[0]):
+            #     for y in range(self.out_shape.shape[1]):
+            #         for z in range(self.num_filters):
+            #             padded_array[x + padding_x][y + padding_y][z] = out_tensors[i].deltas[x][y][z]
 
 
             in_tensor.deltas = np.zeros(in_tensor.shape)
             for x in range(len(padded_array)):
                 for y in range(len(padded_array[0])):
                     for a in range(in_tensor.shape[2]):
+                        # in_tensor.deltas[x][y][a] = np.sum(np.dot(padded_array[x:x + self.kernel_size.shape[0], y: y + self.kernel_size.shape[1]], rotated_filter[0:self.kernel_size.shape[0], 0:self.kernel_size.shape[1], a]))
                         for i in range(self.kernel_size.shape[0]):
                             for j in range(self.kernel_size.shape[1]):
                                 if x + i < len(padded_array) and y + j <len(padded_array[0]):
