@@ -4,6 +4,7 @@ from .layer import Layer
 from ..tensor import Tensor
 from tqdm import tqdm
 
+
 class Conv2DLayer(Layer):
     def __init__(
             self,
@@ -14,7 +15,7 @@ class Conv2DLayer(Layer):
             dilation: tuple = None,
             padding: str = None,
             in_shape: Shape = None,
-        ):
+    ):
         self.out_shape = out_shape
         self.kernel_size = kernel_size
         self.num_filters = num_filters
@@ -29,81 +30,44 @@ class Conv2DLayer(Layer):
     def forward(self, in_tensors: list[Tensor], out_tensors: list[Tensor]):
         for i, tensor in enumerate(in_tensors):
             for x in range(len(tensor.elements) - self.kernel_size.shape[0] + 1):
-                # print(len(tensor.elements))
-                # print(len(tensor.elements) - self.kernel_size.shape[0] + 1)
                 for y in range(len(tensor.elements[0]) - self.kernel_size.shape[1] + 1):
                     for z in range(self.num_filters):
-                        # print(f'{x}, {y}, {z}')
-                        # out_tensors[i].elements[x][y][z] = np.sum([np.multiply(tensor.elements[x + i][y + j][a], self.weights.elements[i][j][a][z]) 
-                        # out_tensors[i].elements[x][y][z] = np.sum([np.multiply(tensor.elements[x + i][y + j][a], self.weights.elements[i][j][a][z]) 
-                        #                                            for j in range(self.kernel_size.shape[0]) 
-                        #                                            for i in range(self.kernel_size.shape[1]) 
-                        #                                            for a in range(self.in_shape.shape[2])])
-                        
-                        out_tensors[i].elements[x][y][z] = np.sum(np.multiply(tensor.elements[x: x + self.kernel_size.shape[1], y: y + self.kernel_size.shape[0], 0: self.in_shape.shape[2]],
-                                                                  self.weights.elements[0: self.kernel_size.shape[1], 0: self.kernel_size.shape[0], 0: self.in_shape.shape[2], z]))
-
+                        out_tensors[i].elements[x][y][z] = np.sum(np.multiply(
+                            tensor.elements[x: x + self.kernel_size.shape[1], y: y + self.kernel_size.shape[0],
+                            0: self.in_shape.shape[2]],
+                            self.weights.elements[0: self.kernel_size.shape[1], 0: self.kernel_size.shape[0],
+                            0: self.in_shape.shape[2], z]))
 
     def backward(self, out_tensors: list[Tensor], in_tensors: list[Tensor]):
-        # maybe always equals the input shape
         padding_x = self.kernel_size.shape[0] - 1
         padding_y = self.kernel_size.shape[1] - 1
-        # output_x = out_shape.shape[0] + 2 * padding_x - (self.kernel_size.shape[0] - 1)
-        # output_y = out_shape.shape[1] + 2 * padding_y - (self.kernel_size.shape[1] - 1)
-        # padded_shape = (output_x, output_y, out_shape.shape[2])
-        # padded_array = np.zeros(padded_shape)
-
-        # rotated_filter = np.zeros(shape=self.weights.shape)
-        # rotated_filter = self.weights.elements[(self.kernel_size.shape[1]-1)-self.kernel_size.shape[1]: (self.kernel_size.shape[1]-1),
-        #                                        (self.kernel_size.shape[0]-1)-self.kernel_size.shape[0]: (self.kernel_size.shape[0]-1),
-        #                                        0:self.in_shape.shape[2],
-        #
-        #                                       0: self.num_filters]
-        # for z in range(self.num_filters):
-        #     for a in range(self.in_shape.shape[2]):
-        #         for i in range(self.kernel_size.shape[1]):
-        #             for j in range(self.kernel_size.shape[0]):
-        #                 rotated_filter[i][j][a][z] = self.weights.elements[(self.kernel_size.shape[1]-1)-i][(self.kernel_size.shape[0]-1)-j][a][z]
         rotated_filter = np.flip(self.weights.elements, axis=(0, 1))
         for i, in_tensor in enumerate(in_tensors):
             padded_array = np.zeros(self.in_shape.shape)
-            padded_array[padding_x: padding_x + self.out_shape.shape[0], padding_y: padding_y + self.out_shape.shape[1]] = out_tensors[i].deltas
-            # for x in range(self.out_shape.shape[0]):
-            #     for y in range(self.out_shape.shape[1]):
-            #         for z in range(self.num_filters):
-            #             padded_array[x + padding_x][y + padding_y][z] = out_tensors[i].deltas[x][y][z]
-
-
+            out_tensors[i].deltas = padded_array[
+                                    padding_x: padding_x + self.out_shape.shape[0],
+                                    padding_y: padding_y + self.out_shape.shape[1]
+                                    ]
             in_tensor.deltas = np.zeros(in_tensor.shape)
             for x in range(len(padded_array)):
                 for y in range(len(padded_array[0])):
                     for a in range(in_tensor.shape[2]):
                         for i in range(self.kernel_size.shape[0]):
                             for j in range(self.kernel_size.shape[1]):
-                                if x + i < len(padded_array) and y + j <len(padded_array[0]):
-                                    in_tensor.deltas[x][y][a] = in_tensor.deltas[x][y][a] + np.dot(padded_array[x + i][y + j], rotated_filter[i][j][a])
-
-    # def calculate_delta_weights(self, out_tensors: list[Tensor], in_tensors: list[Tensor]):
-    #     self.weights.deltas = np.zeros(self.weights.shape)
-    #     kernel_height, kernel_width = self.kernel_size.shape
-    #     for tensor_iter, in_tensor in enumerate(in_tensors):
-    #         in_elements = in_tensor.elements
-    #         for filter in range(self.num_filters):
-    #             out_deltas = out_tensors[tensor_iter].deltas
-    #             for a in range(in_tensor.shape[2]):
-    #                 for i in range(kernel_height):
-    #                     for j in range(kernel_width):
-    #                         self.weights.deltas[i, j, a, filter] = np.sum(
-    #                             in_elements[i:i + out_deltas.shape[0], j:j + out_deltas.shape[1], a] * out_deltas[:, :,filter])
+                                if x + i < len(padded_array) and y + j < len(padded_array[0]):
+                                    in_tensor.deltas[x][y][a] = in_tensor.deltas[x][y][a] + np.dot(
+                                        padded_array[x + i][y + j], rotated_filter[i][j][a])
 
     def calculate_delta_weights(self, out_tensors: list[Tensor], in_tensors: list[Tensor]):
+
         self.weights.deltas = np.zeros(self.weights.shape)
         for tensor_iter, in_tensor in enumerate(in_tensors):
+            x = (len(in_tensor.elements) - self.kernel_size.shape[0] + 1)
+            y = (len(in_tensor.elements[0]) - self.kernel_size.shape[1] + 1)
             for filter in range(self.num_filters):
                 for i in range(self.kernel_size.shape[0]):
                     for j in range(self.kernel_size.shape[1]):
                         for a in range(in_tensor.shape[2]):
-                            x = (len(in_tensor.elements) - self.kernel_size.shape[0] + 1)
-                            y = (len(in_tensor.elements[0]) - self.kernel_size.shape[1] + 1)
                             self.weights.deltas[i][j][a][filter] = np.sum(in_tensor.elements[i: i + x, j: j + y, a] *
-                                                                          out_tensors[tensor_iter].deltas[0:x, 0:y, filter])
+                                                                          out_tensors[tensor_iter].deltas[0:x, 0:y,
+                                                                          filter])
