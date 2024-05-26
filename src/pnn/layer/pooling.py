@@ -1,61 +1,50 @@
-import numpy as np
-
-from ..shape import Shape
 from ..tensor import Tensor
+from ..shape import Shape
+import numpy as np
+from .layer import Layer
 
-
-class Pooling2DLayer:
+class Pooling2DLayer(Layer):
     def __init__(
             self,
-            pooling_type: str,
-            kernel_size: Shape,
-            stride: Shape,
-            in_shape: Shape,
-            out_shape: Shape,
-
-    ):
-        self.pooling_type = pooling_type
+            kernel_size: Shape, 
+            pooling_type: str, 
+            stride: Shape = None, 
+            in_shape: Shape = None, 
+            out_shape: Shape = None) -> None:
         self.kernel_size = kernel_size
         self.stride = stride
+        self.pooling_type = pooling_type
         self.in_shape = in_shape
         self.out_shape = out_shape
         self.masks = []
 
-    def forward(
-            self,
-            input_tensor: list[Tensor],
-            output_tensor: list[Tensor]
-    ):
-        elements = []
-        for tensor in range(len(input_tensor)):
+    def forward(self, in_tensors: list[Tensor], out_tensors: list[Tensor]):
+        for i, tensor in enumerate(in_tensors):
             mask = []
-            for x in range(0, len(input_tensor[tensor].elements), self.stride.shape[0]):
-                p = []
-                for y in range(0, len(input_tensor[tensor].elements[x]), self.stride.shape[1]):
-                    o = []
-                    for z in range(0, len(input_tensor[tensor].elements[x][y])):
-                        kernel = input_tensor[tensor].elements[
+            for x in range(0, len(tensor.elements), self.kernel_size.shape[0]):
+                for y in range(0, len(tensor.elements[0]), self.kernel_size.shape[1]):
+                    for z in range(self.in_shape.shape[2]):
+                        x2 = int(np.divide(x, self.kernel_size.shape[0]))
+                        y2 = int(np.divide(y, self.kernel_size.shape[1]))
+                        kernel = tensor.elements[
                                  x:x + self.kernel_size.shape[0],
                                  y:y + self.kernel_size.shape[1],
                                  z]
-                        value_max = np.max(kernel)
-                        o.append(value_max)
-                        index = np.where(kernel == value_max)
+                        out_tensors[i].elements[x2][y2][z] = np.max(kernel)
+                        index = np.where(kernel == out_tensors[i].elements[x2][y2][z])
                         mask.append([x+index[0][0], y+index[1][0], z])
-                    p.append(o)
-                elements.append(p)
-            output_tensor[tensor].elements = elements
             self.masks.append(mask)
 
-    def backward(
-            self,
-            input_tensor: list[Tensor],
-            output_tensor: list[Tensor]
-    ):
-        for tensor in range(len(input_tensor)):
-            output_tensor[tensor].deltas = np.zeros(shape=self.in_shape.shape)
-            mask = self.masks[tensor]
-            flatt_deltas = input_tensor[tensor].deltas.flatten().tolist()
+
+    
+    def backward(self, out_tensors: list[Tensor], in_tensors: list[Tensor]):
+        for i, tensor in enumerate(in_tensors):
+            tensor.deltas = np.zeros(shape=self.in_shape.shape)
+            mask = self.masks[i]
+            flatt_deltas = out_tensors[i].deltas.flatten().tolist()
             for delta in range(len(flatt_deltas)):
-                output_tensor[tensor].deltas[*mask[delta]] = flatt_deltas[delta]
+                tensor.deltas[*mask[delta]] = flatt_deltas[delta]
             self.masks = []
+
+        
+
