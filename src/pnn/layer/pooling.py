@@ -7,10 +7,10 @@ class Pooling2DLayer(Layer):
     def __init__(
             self,
             kernel_size: Shape, 
-            stride: Shape, 
             pooling_type: str, 
-            in_shape: Shape, 
-            out_shape: Shape) -> None:
+            stride: Shape = None, 
+            in_shape: Shape = None, 
+            out_shape: Shape = None) -> None:
         self.kernel_size = kernel_size
         self.stride = stride
         self.pooling_type = pooling_type

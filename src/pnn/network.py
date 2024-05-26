@@ -56,6 +56,13 @@ class Network():
                     out_shape = layer.out_shape.shape
                     layer.bias = Tensor(np.zeros(layer.num_filters), None)
                     layer.weights = Tensor(_init_weightmatrix((layer.kernel_size.shape[0], layer.kernel_size.shape[1], layer.in_shape.shape[2], layer.num_filters), 'convolution'), None)
+                elif isinstance(layer, Pooling2DLayer):
+                    layer.in_shape = Shape((self.tensorlist[-1][0].shape))
+                    # print(layer.in_shape)
+                    layer.out_shape = Shape((int(np.floor(layer.in_shape.shape[0]/layer.kernel_size.shape[0])),
+                                       int(np.floor(layer.in_shape.shape[1]/layer.kernel_size.shape[1])), 
+                                       layer.in_shape.shape[2]))
+                    out_shape = layer.out_shape.shape
                 elif isinstance(layer, FlattenLayer):
                     out_shape = np.ndarray.flatten(self.tensorlist[-1][0].elements).shape 
 

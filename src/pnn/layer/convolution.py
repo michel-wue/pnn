@@ -35,13 +35,13 @@ class Conv2DLayer(Layer):
                     for z in range(self.num_filters):
                         # print(f'{x}, {y}, {z}')
                         # out_tensors[i].elements[x][y][z] = np.sum([np.multiply(tensor.elements[x + i][y + j][a], self.weights.elements[i][j][a][z]) 
-                        out_tensors[i].elements[x][y][z] = np.sum([np.multiply(tensor.elements[x + i][y + j][a], self.weights.elements[i][j][a][z]) 
-                                                                   for j in range(self.kernel_size.shape[0]) 
-                                                                   for i in range(self.kernel_size.shape[1]) 
-                                                                   for a in range(self.in_shape.shape[2])])
+                        # out_tensors[i].elements[x][y][z] = np.sum([np.multiply(tensor.elements[x + i][y + j][a], self.weights.elements[i][j][a][z]) 
+                        #                                            for j in range(self.kernel_size.shape[0]) 
+                        #                                            for i in range(self.kernel_size.shape[1]) 
+                        #                                            for a in range(self.in_shape.shape[2])])
                         
-                        # out_tensors[i].elements[x][y][z] = np.sum(np.multiply(tensor.elements[x: x + self.kernel_size.shape[1]][y: y + self.kernel_size.shape[0]][0: self.in_shape.shape[2]],
-                        #                                           self.weights.elements[0: self.kernel_size.shape[1]][0: self.kernel_size.shape[0]][0: self.in_shape.shape[2]][z]))
+                        out_tensors[i].elements[x][y][z] = np.sum(np.multiply(tensor.elements[x: x + self.kernel_size.shape[1], y: y + self.kernel_size.shape[0], 0: self.in_shape.shape[2]],
+                                                                  self.weights.elements[0: self.kernel_size.shape[1], 0: self.kernel_size.shape[0], 0: self.in_shape.shape[2], z]))
 
 
     def backward(self, out_tensors: list[Tensor], in_tensors: list[Tensor]):
@@ -54,6 +54,10 @@ class Conv2DLayer(Layer):
         # padded_array = np.zeros(padded_shape)
 
         rotated_filter = np.zeros(shape=self.weights.shape)
+        # rotated_filter = self.weights.elements[(self.kernel_size.shape[1]-1)-self.kernel_size.shape[1]: (self.kernel_size.shape[1]-1),
+        #                                        (self.kernel_size.shape[0]-1)-self.kernel_size.shape[0]: (self.kernel_size.shape[0]-1),
+        #                                        0:self.in_shape.shape[2],
+        #                                        0: self.num_filters]
         for z in range(self.num_filters):
             for a in range(self.in_shape.shape[2]):
                 for i in range(self.kernel_size.shape[1]):
@@ -62,6 +66,7 @@ class Conv2DLayer(Layer):
         
         for i, in_tensor in enumerate(in_tensors):
             padded_array = np.zeros(self.in_shape.shape)
+            
             for x in range(self.out_shape.shape[0]):
                 for y in range(self.out_shape.shape[1]):
                     for z in range(self.num_filters):
