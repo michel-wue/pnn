@@ -64,7 +64,6 @@ class Conv2DLayer(Layer):
             padded_array = np.zeros(self.in_shape.shape)
             padded_array[padding_x: padding_x + self.out_shape.shape[0],
             padding_y: padding_y + self.out_shape.shape[1]] = out_tensors[i].deltas
-            breakpoint()
             in_tensor.deltas = np.zeros(in_tensor.shape)
             for x in range(len(padded_array)):
                 for y in range(len(padded_array[0])):
