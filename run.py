@@ -2,13 +2,14 @@ from pnn.layer.input import InputLayer
 from pnn.tensor import Tensor
 from pnn.layer.fully_connected import FullyConnected
 from pnn.layer.convolution import Conv2DLayer
+from pnn.layer.flatten import FlattenLayer
 from pnn.layer.activation import ActivationLayer, sigmoid, soft_max, relu
 from pnn.layer.loss import LossLayer, mean_squared_error, cross_entropy
 from pnn.network import Network
 from pnn.trainer import Trainer, sgd
 from pnn.shape import Shape
 import matplotlib.pyplot as plt
-import mnist
+from torchvision.datasets import MNIST
 import numpy as np 
 
 def get_plot(sgd_trainer, name, avg_time, prediction_acc):
@@ -21,14 +22,48 @@ def get_plot(sgd_trainer, name, avg_time, prediction_acc):
     plt.show()
 
 if __name__ == "__main__":
-    train_images = mnist.train_images()
-    train_images = np.divide(train_images, np.max(train_images))
-    train_labels = mnist.train_labels()
+    train_data = MNIST(
+        root = 'data',
+        train = True,                                    
+    )
+    train_images = np.divide(np.array(train_data.data), np.max(np.array(train_data.data)))
+    train_labels = np.array(train_data.targets)
 
-    test_images = mnist.test_images()
-    test_images = np.divide(test_images, np.max(test_images))
-    test_labels = mnist.test_labels()
+    test_data = MNIST(
+        root = 'data', 
+        train = False, 
+    )
+    test_images = np.divide(np.array(test_data.data), np.max(np.array(test_data.data)))
+    test_labels = np.array(test_data.targets)
 
+
+    conv1 = Conv2DLayer(kernel_size=Shape((3,3)), num_filters=1)
+    flatten = FlattenLayer()
+    # fully_connected_1 = FullyConnected(out_shape=Shape((784,)), initialization_technique='sigmoid')
+    # activation_layer_sigmoid1 = ActivationLayer(sigmoid)
+    fully_connected_2 = FullyConnected(out_shape=Shape((196,)), initialization_technique='sigmoid')
+    activation_layer_sigmoid2 = ActivationLayer(sigmoid)
+    # fully_connected_3 = FullyConnected(out_shape=Shape((49,)), initialization_technique='sigmoid')
+    # activation_layer_sigmoid3 = ActivationLayer(sigmoid)
+    fully_connected_4 = FullyConnected(out_shape=Shape((10,)), initialization_technique='softmax') 
+    activation_layer_soft_max = ActivationLayer(soft_max)
+    loss_layer = LossLayer(cross_entropy)
+    layerlist = [conv1,
+                flatten,
+                #fully_connected_1, activation_layer_sigmoid1, 
+                fully_connected_2, activation_layer_sigmoid2,
+                #  fully_connected_3, activation_layer_sigmoid3,
+                fully_connected_4, activation_layer_soft_max, loss_layer]
+    network = Network(layerlist, type = 'convolutional')
+
+    sgd_trainer = Trainer(
+        learning_rate=0.03,
+        amount_epochs=1,
+        update_mechanism=sgd,
+        batch_size=1)
+
+    sgd_trainer.optimize(network=network, data=train_images, labels=train_labels)
+    
     # # fully_connected_1 = FullyConnected(out_shape=Shape((784,)), initialization_technique='sigmoid')
     # # activation_layer_sigmoid1 = ActivationLayer(sigmoid)
     # fully_connected_2 = FullyConnected(out_shape=Shape((196,)), initialization_technique='sigmoid')

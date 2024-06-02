@@ -1,8 +1,7 @@
 import unittest
 from pnn.layer.fully_connected import FullyConnected
-# from pnn.layer.fully_connected import Pooling2DLayer
+from pnn.layer.pooling import Pooling2DLayer
 from pnn.layer.convolution import Conv2DLayer
-# from pnn.layer.fully_connected import PoolingType
 
 import unittest
 import numpy as np
@@ -55,80 +54,81 @@ class TestFullyConnectedLayer(unittest.TestCase):
 
 
 
-# class TestPooling2D(unittest.TestCase):
-#     def test_max_pooling_forward_backward(self):
-#         in_tensor = Tensor(elements=np.array([
-#             [
-#                 [1, 1],
-#                 [2, 2],
-#                 [3, 3],
-#                 [4, 4]
-#             ],
-#             [
-#                 [5, 5],
-#                 [6, 6],
-#                 [7, 7],
-#                 [8, 8]
-#             ],
-#             [
-#                 [9, 9],
-#                 [10, 10],
-#                 [11, 11],
-#                 [12, 12]
-#             ],
-#             [
-#                 [13, 13],
-#                 [14, 14],
-#                 [15, 15],
-#                 [16, 16]
-#             ]
-#         ]))
-#         out_tensor = Tensor(shape=Shape((2, 2, 2)))
-#         pool_layer = Pooling2DLayer(kernel_size=Shape((2, 2)), stride=Shape((2, 2)), pooling_type=PoolingType.MAX, in_shape=Shape((4, 4, 2)), out_shape=Shape((2, 2, 2)))
+class TestPooling2D(unittest.TestCase):
+    def test_max_pooling_forward_backward(self):
+        in_tensor = Tensor(elements=np.array([
+            [
+                [1, 1],
+                [2, 2],
+                [3, 3],
+                [4, 4]
+            ],
+            [
+                [5, 5],
+                [6, 6],
+                [7, 7],
+                [8, 8]
+            ],
+            [
+                [9, 9],
+                [10, 10],
+                [11, 11],
+                [12, 12]
+            ],
+            [
+                [13, 13],
+                [14, 14],
+                [15, 15],
+                [16, 16]
+            ]
+        ]))
+        # out_tensor = Tensor(shape=Shape((2, 2, 2)))
+        out_tensor = Tensor(elements=np.zeros((2, 2, 2)))
+        pool_layer = Pooling2DLayer(kernel_size=Shape((2, 2)), stride=Shape((2, 2)), pooling_type='max', in_shape=Shape((4, 4, 2)), out_shape=Shape((2, 2, 2)))
 
-#         pool_layer.forward([in_tensor], [out_tensor])
-#         expected_forward_result = np.array([
-#             [
-#                 [6, 6],
-#                 [8, 8]
-#             ],
-#             [
-#                 [14, 14],
-#                 [16, 16]
-#             ]
-#         ])
-#         np.testing.assert_array_almost_equal(out_tensor.elements, expected_forward_result)
+        pool_layer.forward([in_tensor], [out_tensor])
+        expected_forward_result = np.array([
+            [
+                [6, 6],
+                [8, 8]
+            ],
+            [
+                [14, 14],
+                [16, 16]
+            ]
+        ])
+        np.testing.assert_array_almost_equal(out_tensor.elements, expected_forward_result)
 
-#         out_tensor.deltas = np.ones((2, 2, 2))
-#         pool_layer.backward([out_tensor], [in_tensor])
-#         expected_backward_result = np.array([
-#                     [
-#                         [0, 0],
-#                         [0, 0],
-#                         [0, 0],
-#                         [0, 0]
-#                     ],
-#                     [
-#                         [0, 0],
-#                         [1, 1],
-#                         [0, 0],
-#                         [1, 1]
-#                     ],
-#                     [
-#                         [0, 0],
-#                         [0, 0],
-#                         [0, 0],
-#                         [0, 0]
-#                     ],
-#                     [
-#                         [0, 0],
-#                         [1, 1],
-#                         [0, 0],
-#                         [1, 1]
-#                     ]
-#                 ])
+        out_tensor.deltas = np.ones((2, 2, 2))
+        pool_layer.backward([out_tensor], [in_tensor])
+        expected_backward_result = np.array([
+                    [
+                        [0, 0],
+                        [0, 0],
+                        [0, 0],
+                        [0, 0]
+                    ],
+                    [
+                        [0, 0],
+                        [1, 1],
+                        [0, 0],
+                        [1, 1]
+                    ],
+                    [
+                        [0, 0],
+                        [0, 0],
+                        [0, 0],
+                        [0, 0]
+                    ],
+                    [
+                        [0, 0],
+                        [1, 1],
+                        [0, 0],
+                        [1, 1]
+                    ]
+                ])
 
-#         np.testing.assert_array_almost_equal(in_tensor.deltas, expected_backward_result)
+        np.testing.assert_array_almost_equal(in_tensor.deltas, expected_backward_result)
 
 class TestConv2DLayer(unittest.TestCase):
     def test_forward(self) -> None:
