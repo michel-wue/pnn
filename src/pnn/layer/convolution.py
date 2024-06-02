@@ -39,9 +39,19 @@ class Conv2DLayer(Layer):
                             0: self.in_shape.shape[2], z]))
 
     def backward(self, out_tensors: list[Tensor], in_tensors: list[Tensor]):
+        # maybe always equals the input shape
         padding_x = self.kernel_size.shape[0] - 1
         padding_y = self.kernel_size.shape[1] - 1
+        # output_x = out_shape.shape[0] + 2 * padding_x - (self.kernel_size.shape[0] - 1)
+        # output_y = out_shape.shape[1] + 2 * padding_y - (self.kernel_size.shape[1] - 1)
+        # padded_shape = (output_x, output_y, out_shape.shape[2])
+        # padded_array = np.zeros(padded_shape)
+
         rotated_filter = np.zeros(shape=self.weights.shape)
+        # rotated_filter = self.weights.elements[(self.kernel_size.shape[1]-1)-self.kernel_size.shape[1]: (self.kernel_size.shape[1]-1),
+        #                                        (self.kernel_size.shape[0]-1)-self.kernel_size.shape[0]: (self.kernel_size.shape[0]-1),
+        #                                        0:self.in_shape.shape[2],
+        #                                        0: self.num_filters]
         for z in range(self.num_filters):
             for a in range(self.in_shape.shape[2]):
                 for i in range(self.kernel_size.shape[1]):
@@ -49,21 +59,23 @@ class Conv2DLayer(Layer):
                         rotated_filter[i][j][a][z] = \
                         self.weights.elements[(self.kernel_size.shape[1] - 1) - i][(self.kernel_size.shape[0] - 1) - j][
                             a][z]
+
         for i, in_tensor in enumerate(in_tensors):
             padded_array = np.zeros(self.in_shape.shape)
-            out_tensors[i].deltas = padded_array[
-                                    padding_x: padding_x + self.out_shape.shape[0],
-                                    padding_y: padding_y + self.out_shape.shape[1]
-                                    ]
+            padded_array[padding_x: padding_x + self.out_shape.shape[0],
+            padding_y: padding_y + self.out_shape.shape[1]] = out_tensors[i].deltas
+            breakpoint()
             in_tensor.deltas = np.zeros(in_tensor.shape)
             for x in range(len(padded_array)):
                 for y in range(len(padded_array[0])):
                     for a in range(in_tensor.shape[2]):
                         for i in range(self.kernel_size.shape[0]):
+                            if x + i >= len(padded_array):
+                                continue
                             for j in range(self.kernel_size.shape[1]):
-                                if x + i < len(padded_array) and y + j < len(padded_array[0]):
-                                    in_tensor.deltas[x][y][a] = in_tensor.deltas[x][y][a] + np.dot(
-                                        padded_array[x + i][y + j], rotated_filter[i][j][a])
+                                if y + j >= len(padded_array[0]):
+                                    continue
+                                in_tensor.deltas[x][y][a] += np.dot(padded_array[x + i][y + j], rotated_filter[i][j][a])
 
     def calculate_delta_weights(self, out_tensors: list[Tensor], in_tensors: list[Tensor]):
         self.weights.deltas = np.zeros(self.weights.shape)
