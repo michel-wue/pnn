@@ -41,7 +41,14 @@ class Conv2DLayer(Layer):
     def backward(self, out_tensors: list[Tensor], in_tensors: list[Tensor]):
         padding_x = self.kernel_size.shape[0] - 1
         padding_y = self.kernel_size.shape[1] - 1
-        rotated_filter = np.flip(self.weights.elements, axis=(0, 1))
+        rotated_filter = np.zeros(shape=self.weights.shape)
+        for z in range(self.num_filters):
+            for a in range(self.in_shape.shape[2]):
+                for i in range(self.kernel_size.shape[1]):
+                    for j in range(self.kernel_size.shape[0]):
+                        rotated_filter[i][j][a][z] = \
+                        self.weights.elements[(self.kernel_size.shape[1] - 1) - i][(self.kernel_size.shape[0] - 1) - j][
+                            a][z]
         for i, in_tensor in enumerate(in_tensors):
             padded_array = np.zeros(self.in_shape.shape)
             out_tensors[i].deltas = padded_array[
@@ -59,7 +66,6 @@ class Conv2DLayer(Layer):
                                         padded_array[x + i][y + j], rotated_filter[i][j][a])
 
     def calculate_delta_weights(self, out_tensors: list[Tensor], in_tensors: list[Tensor]):
-
         self.weights.deltas = np.zeros(self.weights.shape)
         for tensor_iter, in_tensor in enumerate(in_tensors):
             x = (len(in_tensor.elements) - self.kernel_size.shape[0] + 1)
