@@ -68,13 +68,12 @@ class Conv2DLayer(Layer):
             for x in range(len(padded_array)):
                 for y in range(len(padded_array[0])):
                     for a in range(in_tensor.shape[2]):
-                        for i in range(self.kernel_size.shape[0]):
-                            if x + i >= len(padded_array):
-                                continue
-                            for j in range(self.kernel_size.shape[1]):
-                                if y + j >= len(padded_array[0]):
-                                    continue
-                                in_tensor.deltas[x][y][a] += np.dot(padded_array[x + i][y + j], rotated_filter[i][j][a])
+                        cut_edge_x = np.maximum(0, x + self.kernel_size.shape[0] - len(padded_array))
+                        cut_edge_y = np.maximum(0, y + self.kernel_size.shape[1] - len(padded_array[0]))
+                        in_tensor.deltas[x][y][a] = np.sum(
+                            np.multiply(padded_array[x:x + self.kernel_size.shape[0], y: y + self.kernel_size.shape[1]],
+                                        rotated_filter[0:self.kernel_size.shape[0] - cut_edge_x,
+                                        0:self.kernel_size.shape[1] - cut_edge_y, a]))
 
     def calculate_delta_weights(self, out_tensors: list[Tensor], in_tensors: list[Tensor]):
         self.weights.deltas = np.zeros(self.weights.shape)
