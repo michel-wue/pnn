@@ -21,8 +21,8 @@ class Pooling2DLayer(Layer):
     def forward(self, in_tensors: list[Tensor], out_tensors: list[Tensor]):
         for i, tensor in enumerate(in_tensors):
             mask = []
-            for x in range(0, len(tensor.elements), self.kernel_size.shape[0]):
-                for y in range(0, len(tensor.elements[0]), self.kernel_size.shape[1]):
+            for x in range(0, len(tensor.elements), self.stride.shape[0]):
+                for y in range(0, len(tensor.elements[0]), self.stride.shape[1]):
                     for z in range(self.in_shape.shape[2]):
                         x2 = int(np.divide(x, self.kernel_size.shape[0]))
                         y2 = int(np.divide(y, self.kernel_size.shape[1]))
